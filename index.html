@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body>
+    
+    <!-- Semantic HTML5 elements -->
+    <header>
+        <h1>Todo List Teoteo</h1>
+    </header>
+
+    <!-- Main content area -->
+    <main>
+        <!--form section-->
+        <section>
+            <form id="todo-form">
+            <!-- Input for new todo item -->
+            <input type="text" id="todo-input" placeholder="Enter a new todo" required>
+            
+            <!-- Input for date -->
+            <input type="date" id="todo-date" placeholder="Enter a date" required>
+            
+            <!-- Submit button -->
+            <button type="submit">Add Todo</button>
+        </section>
+        
+        <!--todo list section-->
+        <section>
+            <ul id="todo-list"></ul>
+        </section>
+
+    </main>
+
+    <!-- Footer section -->
+    <footer></footer>
+
+    <!-- Link to external JavaScript file -->
+    <script src="js/scripts.js"></script>
+
+</body>
+</html>

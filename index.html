@@ -5,42 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo List Teoteo</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="css/styles.css">
+
 </head>
-<body class="bg-gray-100 font-sans">
+<body>
     
-    <header class="bg-white shadow-md">
-        <div class="max-w-3xl mx-auto p-4 py-6">
-            <h1 class="text-3xl font-bold text-center text-gray-800">Todo List Teoteo</h1>
-        </div>
+    <header>
+        <h1>Todo List Teoteo</h1>
     </header>
 
-    <main class="max-w-3xl mx-auto p-4">
-        
-        <section class="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-6">
-            <form id="todo-form" class="flex flex-col sm:flex-row gap-4">
-                
-                <input type="text" id="todo-input" placeholder="Enter a new todo" required 
-                       class="flex-1 border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                
-                <input type="date" id="todo-date" required
-                       class="border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                
-                <button type="submit" 
-                        class="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                    Add Todo
-                </button>
+    <main>
+        <section class="section-container">
+            <form id="todo-form">
+                <input type="text" id="todo-input" placeholder="Enter a new todo" required>
+                <input type="date" id="todo-date" required>
+                <button type="submit">Add Todo</button>
             </form>
         </section>
         
-        <section class="bg-white rounded-lg shadow-md overflow-hidden">
+        <section>
             <ul id="todo-list">
                 </ul>
         </section>
 
     </main>
 
-    <footer class="text-center text-gray-500 text-sm mt-8 pb-6">
+    <footer>
         <h6>Created by Gibran Toto</h6>
     </footer>
 

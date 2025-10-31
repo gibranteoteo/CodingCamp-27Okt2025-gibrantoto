@@ -50,7 +50,8 @@ function addTodo() {
         id: Date.now(),
         text: todoText,
         dueDate: todoDueDate,
-        status: 'pending'
+        status: 'pending',
+        isEditing: false
     };
 
     //// Add new todo to the list (assuming todos is a global array)
@@ -65,65 +66,55 @@ function addTodo() {
 
     // Log the new todo for debugging
     console.log('Added Todo:', newTodo);
-
-    // Provide user feedback
-    alert('Todo added successfully.');
 }
 
 //// Render Todos function
 function renderTodos() {
-    // Get the todo list container
     const todoList = document.getElementById('todo-list');
-    todoList.innerHTML = ''; // Clear existing list
-
-    // Loop through todos and create list items
+    todoList.innerHTML = ''; // Kosongkan list
+    
     todos.forEach(todo => {
-        // Create list item
         const listItem = document.createElement('li');
-
-        listItem.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border-b border-gray-200 gap-2';
+        listItem.className = 'todo-item';
         
         if (todo.status === 'completed') {
-            listItem.classList.add('opacity-60', 'bg-gray-50');
+            listItem.classList.add('completed');
         }
 
-        const toggleButtonText = (todo.status === 'completed') ? 'Undo' : 'Mark as Completed';
-        const toggleButtonClass = (todo.status === 'completed') ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600';
+        // --- INI ADALAH LOGIKA UTAMA ---
+        if (todo.isEditing) {
+            // Tampilan "Mode Edit" (menggunakan <input>)
+            listItem.innerHTML = `
+                <div class="todo-details edit-mode">
+                    <input type="text" id="edit-text-${todo.id}" class="edit-input-text" value="${todo.text}">
+                    <input type="date" id="edit-date-${todo.id}" class="edit-input-date" value="${todo.dueDate}">
+                </div>
+                <div class="todo-actions">
+                    <button onclick="saveTodo(${todo.id})" class="btn btn-save">Save</button>
+                    <button onclick="cancelEdit(${todo.id})" class="btn btn-cancel">Cancel</button>
+                </div>
+            `;
+        } else {
+            // Tampilan "Mode Baca" (kode Anda sebelumnya)
+            const isCompleted = todo.status === 'completed';
+            const toggleButtonText = isCompleted ? 'Undo' : 'Mark Done';
+            const toggleButtonClasses = isCompleted ? 'btn btn-toggle-undo' : 'btn btn-toggle-done';
+            const statusBadgeClasses = `todo-status ${isCompleted ? 'completed' : 'pending'}`;
+
+            listItem.innerHTML = `
+                <div class="todo-details">
+                    <span class="todo-text">${todo.text}</span>
+                    <span class="todo-date">Due: ${todo.dueDate}</span>
+                    <span class="${statusBadgeClasses}">${todo.status}</span>
+                </div>
+                <div class="todo-actions">
+                    <button onclick="editTodo(${todo.id})" class="btn btn-edit">Edit</button>
+                    <button onclick="toggleDone(${todo.id})" class="${toggleButtonClasses}">${toggleButtonText}</button>
+                    <button onclick="deleteTodo(${todo.id})" class="btn btn-delete">Delete</button>
+                </div>
+            `;
+        }
         
-        const statusBadgeClass = (todo.status === 'completed') ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
-
-        listItem.textContent = `${todo.text} (Due: ${todo.dueDate}) `;
-        listItem.innerHTML = `
-            <div class="flex-1 min-w-0">
-                <span class="todo-text font-semibold break-words ${todo.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900'}">
-                    ${todo.text}
-                </span>
-                
-                <span class="todo-status text-xs font-medium px-2.5 py-0.5 rounded-full ${statusBadgeClass} ml-0 sm:ml-2 mt-1 sm:mt-0 inline-block">
-                    ${todo.status}
-                </span>
-
-                <span class="todo-date text-sm text-gray-500 block mt-1">
-                    Due: ${todo.dueDate}
-                </span>
-            </div>
-            
-            <div class="todo-actions flex-shrink-0 flex flex-col sm:flex-row sm:items-center gap-2 mt-2 sm:mt-0 w-full sm:w-auto">
-                <button onclick="editTodo(${todo.id})" 
-                        class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm font-medium hover:bg-blue-600 w-full sm:w-auto">
-                    Edit
-                </button>
-                <button onclick="toggleDone(${todo.id})" 
-                        class="mark-done-btn ${toggleButtonClass} text-white px-3 py-1 rounded-md text-sm font-medium w-full sm:w-auto">
-                    ${toggleButtonText}
-                </button>
-                <button onclick="deleteTodo(${todo.id})" 
-                        class="delete-btn bg-red-500 text-white px-3 py-1 rounded-md text-sm font-medium hover:bg-red-600 w-full sm:w-auto">
-                    Delete
-                </button>
-            </div>
-        `;
-        // Append list item to the todo list
         todoList.appendChild(listItem);
     });
 }
@@ -132,9 +123,6 @@ function renderTodos() {
 function deleteTodo(id) {
     // Filter out the todo with the given id
     todos = todos.filter(todo => todo.id !== id);
-
-    // Provide user feedback
-    alert('Todo deleted successfully.');
 
     // Re-render the todo list
     renderTodos();  
@@ -156,16 +144,53 @@ function toggleDone(id) {
 }
 
 function editTodo(id) {
-    const todo = todos.find(t => t.id === id); // Cari todo
+    // Pertama, pastikan tidak ada item lain yang sedang diedit
+    todos.forEach(t => { t.isEditing = false; });
+    
+    // Temukan todo yang akan diedit dan set 'isEditing' jadi true
+    const todo = todos.find(t => t.id === id);
     if (todo) {
-        const newText = prompt('Enter new text for your todo:', todo.text);
-        
-        if (newText !== null && newText.trim() !== '') {
-            todo.text = newText.trim(); // Update teksnya
-            renderTodos(); // Render ulang
-            console.log('Edited Todo ID:', id);
-        }
+        todo.isEditing = true;
     }
+    
+    // Render ulang list untuk menampilkan input field
+    renderTodos();
+}
+
+function saveTodo(id) {
+    // 1. Dapatkan nilai baru dari input field (yang punya ID unik)
+    const newTextInput = document.getElementById(`edit-text-${id}`);
+    const newDateInput = document.getElementById(`edit-date-${id}`);
+    
+    const newText = newTextInput.value.trim();
+    const newDate = newDateInput.value;
+
+    // 2. Validasi nilai baru
+    if (validateForm(newText, newDate) === false) {
+        return; // Hentikan jika tidak valid
+    }
+
+    // 3. Temukan todo di array dan perbarui datanya
+    const todo = todos.find(t => t.id === id);
+    if (todo) {
+        todo.text = newText;
+        todo.dueDate = newDate;
+        todo.isEditing = false; // KELUAR dari mode edit
+    }
+
+    // 4. Render ulang list untuk menampilkan data yang sudah diperbarui
+    renderTodos();
+    console.log('Saved Todo ID:', id);
+}
+
+function cancelEdit(id) {
+    // Temukan todo dan set 'isEditing' kembali ke false
+    const todo = todos.find(t => t.id === id);
+    if (todo) {
+        todo.isEditing = false;
+    }
+    // Render ulang (perubahan di input akan terbuang)
+    renderTodos();
 }
 
 // Initial render
